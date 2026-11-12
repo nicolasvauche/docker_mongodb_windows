@@ -1,0 +1,32 @@
+services:
+  mongodb:
+    image: mongo:${MONGO_VERSION:-9.0.8}
+    command: [mongod, --config, /etc/mongod.conf]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?Lancez ./dev.ps1 init ou renseignez MONGO_PASSWORD dans .env}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-app}
+    ports:
+      - "127.0.0.1:${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./docker/mongod.conf:/etc/mongod.conf:ro
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
+      - ./docker/scripts:/opt/mongodb-tools:ro
+    stop_grace_period: 60s
+    healthcheck:
+      test: [CMD, sh, /opt/mongodb-tools/healthcheck.sh]
+      interval: 5s
+      timeout: 10s
+      retries: 18
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mongodb_data:
+  mongodb_config:

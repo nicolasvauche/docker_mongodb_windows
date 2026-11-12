@@ -1,0 +1,11 @@
+/.env
+/.env.*
+!/.env.example
+/.idea/
+/.vscode/
+/compose.override.yaml
+/backups/*
+!/backups/.gitkeep
+.DS_Store
+Thumbs.db
+Desktop.ini
